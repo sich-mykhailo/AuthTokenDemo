@@ -1,7 +1,7 @@
 package com.authtokendemo.security;
 
-import com.authtokendemo.model.User;
-import com.authtokendemo.service.UserService;
+import com.authtokendemo.model.Employee;
+import com.authtokendemo.service.EmployeeService;
 import java.util.Optional;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,23 +11,23 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    private final UserService userService;
+    private final EmployeeService employeeService;
 
-    public CustomUserDetailsService(UserService userService) {
-        this.userService = userService;
+    public CustomUserDetailsService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> userOptional = userService.findByEmail(email);
+        Optional<Employee> userOptional = employeeService.findEmployeeByEmail(email);
 
         UserBuilder builder;
         if (userOptional.isPresent()) {
             builder = org.springframework.security.core.userdetails.User.withUsername(email);
-            builder.password(userOptional.get().getPassword());
             builder.roles("USER");
+            builder.password("1234");
             return builder.build();
         }
-        throw new UsernameNotFoundException("User not found.");
+        throw new UsernameNotFoundException("Employee not found.");
     }
 }

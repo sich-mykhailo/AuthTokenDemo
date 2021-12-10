@@ -1,41 +1,29 @@
 package com.authtokendemo.security;
 
 import com.authtokendemo.exception.AuthenticationException;
-import com.authtokendemo.model.User;
-import com.authtokendemo.service.UserService;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.authtokendemo.model.Employee;
+import com.authtokendemo.model.dto.GoogleLoginDto;
+import com.authtokendemo.service.GoogleService;
+import java.io.IOException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
-    private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+    public static final String NERDY_DOMAIN = "nerdysoft.com";
+    private final GoogleService googleService;
 
-    public AuthenticationServiceImpl(UserService userService,
-                                     PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
+
+    public AuthenticationServiceImpl(GoogleService googleService) {
+        this.googleService = googleService;
     }
 
     @Override
-    public User register(String email, String password) {
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user = userService.save(user);
-        return user;
-    }
-
-    @Override
-    public User login(String login, String password) throws AuthenticationException {
-        Optional<User> user = userService.findByEmail(login);
-        String encodedPassword = passwordEncoder.encode(password);
-        if (user.isEmpty() || user.get().getPassword().equals(encodedPassword)) {
-            throw new AuthenticationException("Incorrect username or password!!!");
+    public Employee login(GoogleLoginDto googleLoginDto) throws AuthenticationException, IOException {
+        Employee employee = googleService.getEmployeeFromToken(googleLoginDto);
+        String employeeDomain = employee.getEmail().substring(employee.getEmail().indexOf("@") + 1);
+        if (NERDY_DOMAIN.equals(employeeDomain)) {
+            return employee;
         }
-        return user.get();
+        throw new AuthenticationException("Incorrect domain!!");
     }
 }

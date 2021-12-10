@@ -2,10 +2,10 @@ package com.authtokendemo.security;
 
 
 import com.authtokendemo.exception.AuthenticationException;
-import com.authtokendemo.model.User;
+import com.authtokendemo.model.Employee;
+import com.authtokendemo.model.dto.GoogleLoginDto;
+import java.io.IOException;
 
 public interface AuthenticationService {
-    User register(String email, String password);
-
-    User login(String login, String password) throws AuthenticationException;
+    Employee login(GoogleLoginDto googleLoginDto) throws AuthenticationException, IOException;
 }
